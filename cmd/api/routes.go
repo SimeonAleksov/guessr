@@ -4,6 +4,8 @@ import (
   "net/http"
   "github.com/julienschmidt/httprouter"
 )
+
+
 func (app *application) routes() *httprouter.Router {
   router := httprouter.New()
 
@@ -19,6 +21,8 @@ func (app *application) routes() *httprouter.Router {
   router.HandlerFunc(http.MethodGet, "/v1/songs/:id", app.showSongHandler)
   router.HandlerFunc(http.MethodPut, "/v1/songs/:id", app.updateSongHandler)
   router.HandlerFunc(http.MethodDelete, "/v1/songs/:id", app.deleteSongHandler)
+
+  router.HandlerFunc(http.MethodPost, "/v1/users", app.createUserHandler)
 
   return router
 }

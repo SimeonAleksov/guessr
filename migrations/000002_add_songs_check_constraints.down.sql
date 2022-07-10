@@ -1,2 +1,1 @@
-
-ALTER TABLE song DROP CONSTRAINT IF EXISTS genres_length_check;
+ALTER TABLE songs DROP CONSTRAINT IF EXISTS genres_length_check;

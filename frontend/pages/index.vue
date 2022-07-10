@@ -1,6 +1,11 @@
 <template>
-  <div>
-    <h1 class="dark:text-primary text-4xl"> Guessr </h1>
+  <div class="flex flex-col justify-center items-center">
+    <h1 class="font-mono text-4xl dark:text-secondary">
+      How well do you know your <span class="text-primary">music</span>?
+    </h1>
+    <h2 class="font-mono text-md dark:text-secondary">
+      Create an account and start listening and guessing!
+    </h2>
   </div>
 </template>
 

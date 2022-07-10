@@ -70,7 +70,7 @@ func (app *application) showSongHandler(w http.ResponseWriter, r *http.Request) 
     }
     err = app.writeJSON(w, http.StatusOK, envelope{"song": song}, nil)
     if err != nil {
-        app.logger.Println(err)
+        app.logger.Fatal(err, nil)
         app.serverErrorResponse(w, r, err)
   }
 }
