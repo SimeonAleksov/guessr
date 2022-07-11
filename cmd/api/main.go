@@ -1,19 +1,20 @@
 package main
 
 import (
-  "context"
-  "database/sql"
-  "flag"
-  "fmt"
-  "log"
-  "net/http"
-  "os"
-  "time"
+	"context"
+	"database/sql"
+	"flag"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"sync"
+	"time"
 
-  "guessr.net/internal/data"
-  "guessr.net/internal/jsonlog"
+	"guessr.net/internal/data"
+	"guessr.net/internal/jsonlog"
 
-  _ "github.com/lib/pq"
+	_ "github.com/lib/pq"
 )
 
 const version = "1.0.0"

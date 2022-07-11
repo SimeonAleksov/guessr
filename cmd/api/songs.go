@@ -163,3 +163,14 @@ func (app *application) listSongsHandler(w http.ResponseWriter, r *http.Request)
         app.serverErrorResponse(w, r, err)
     }
 }
+
+
+func (app *application) playSong(w http.ResponseWriter, r *http.Request) {
+}
+
+func (app *application) addHeaders(h http.Handler) http.HandlerFunc {
+    return func(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Access-Control-Allow-Origin", "*")
+        h.ServeHTTP(w, r)
+    }
+}

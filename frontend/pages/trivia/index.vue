@@ -45,10 +45,13 @@
       </TriviaButton>
     </div>
     <Vinyl class="mt-24"/>
+    <video allow="autoplay" ref="video" width="100%" controls playsinline="" hidden autoplay>
+    </video>
   </div>
   </div>
 </template>
 <script>
+import Hls from 'hls.js'
 import Button from '../../components/shared/Button.vue'
 import TriviaButton from '../../components/shared/TriviaButton.vue'
 import Waves from '../../components/Waves.vue'
@@ -60,7 +63,24 @@ export default {
       TriviaButton,
       Waves,
       Vinyl,
-  }
+  },
+  mounted() {
+    let hls = new Hls();
+    let video = this.$refs["video"];
+    hls.attachMedia(video);
+    hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+      console.log('video and hls.js are now bound together !');
+      hls.loadSource('http://localhost:4000/songs/brkovi/outputlist.m3u8');
+      hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+        console.log(
+          'manifest loaded, found ' + data.levels.length + ' quality level'
+        );
+
+      video.play()
+      });
+    });
+    console.log(video)
+  },
 }
 </script>
 <<style lang="scss">
