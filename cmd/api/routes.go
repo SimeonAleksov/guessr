@@ -1,8 +1,10 @@
 package main
 
 import (
-  "net/http"
-  "github.com/julienschmidt/httprouter"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/julienschmidt/httprouter"
 )
 
 
@@ -14,7 +16,7 @@ func (app *application) routes() http.Handler {
 
   router.MethodNotAllowed = http.HandlerFunc(app.methodNotAllowedResponse)
 
-  router.HandlerFunc(http.MethodGet, "/v1/healthcheck", app.healthcheckHandler)
+  // router.HandlerFunc(http.MethodGet, "/v1/healthcheck", app.healthcheckHandler)
 
   router.HandlerFunc(http.MethodGet, "/v1/songs", app.requireAuthentication(app.listSongsHandler))
   router.HandlerFunc(http.MethodPost, "/v1/songs", app.createSongHandler)
@@ -29,4 +31,11 @@ func (app *application) routes() http.Handler {
   router.ServeFiles("/songs/*filepath", http.Dir("songs"))
 
   return app.enableCORS(app.authenticate(router))
+}
+
+
+func (app *application) newRoutes(router gin.IRouter) gin.RouterGroup {
+    v1 := router.Group("v1")
+    v1.GET("/healthchekck", app.healthcheck)
+    return v1
 }
