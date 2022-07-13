@@ -22,6 +22,7 @@ func SetupRoute() *gin.Engine {
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 	router.Use(middleware.CORS())
+	// router.Use(middleware.AuthenticationMiddleware())
 
 	RegisterRoutes(router)
 
