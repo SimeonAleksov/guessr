@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"guessr.net/pkg/database"
+	models "guessr.net/models/users"
 	"net/http"
 
 	jwt "guessr.net/pkg/jwt"
@@ -26,7 +26,7 @@ func (u UserController) Login(c *gin.Context) {
 		return
 	}
 
-	userId, err := database.GetUserByUsername(input.Username)
+	userId, err := models.GetUserByUsername(input.Username)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
@@ -63,7 +63,7 @@ func (u UserController) Register(c *gin.Context) {
 		return
 	}
 
-	user := database.User{}
+	user := models.User{}
 
 	user.Username = input.Username
 	user.Password = input.Password
@@ -89,7 +89,7 @@ func (u UserController) CurrentUser(c *gin.Context) {
 		return
 	}
 
-	user, err := database.GetUserByID(userId)
+	user, err := models.GetUserByID(userId)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

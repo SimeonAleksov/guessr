@@ -100,7 +100,7 @@ func (h *Hub) Subscribe(client *Client, topic string, token string) *Hub {
 		log.Fatalln("User needs to be signed in.")
 	}
 
-	Consume(context.Background(), u, client)
+	Consume(context.Background(), uint(u), client)
 	log.Printf("User with ID %d subscribed to topic %s.\n", u, topic)
 	if len(clientSubs) > 0 {
 		return h
@@ -108,7 +108,7 @@ func (h *Hub) Subscribe(client *Client, topic string, token string) *Hub {
 	newSubscription := Subscription{
 		Topic:  topic,
 		Client: client,
-		UserId: u,
+		UserId: uint(u),
 	}
 	h.Subscriptions = append(h.Subscriptions, newSubscription)
 	return h

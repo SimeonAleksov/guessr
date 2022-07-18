@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func GenerateToken(user_id uint, isRefresh bool) (string, error) {
+func GenerateToken(user_id int64, isRefresh bool) (string, error) {
 	signingKey := []byte(viper.GetString("SECRET"))
 	var err error
 	var token_lifespan int
@@ -67,7 +67,7 @@ func ExtractToken(c *gin.Context) string {
 	return ""
 }
 
-func ExtractTokenID(c *gin.Context) (uint, error) {
+func ExtractTokenID(c *gin.Context) (int64, error) {
 	tokenString := ExtractToken(c)
 	token, err := j.Parse(tokenString, func(token *j.Token) (interface{}, error) {
 		if _, ok := token.Method.(*j.SigningMethodHMAC); !ok {
@@ -85,12 +85,12 @@ func ExtractTokenID(c *gin.Context) (uint, error) {
 		if err != nil {
 			return 0, err
 		}
-		return uint(uid), nil
+		return int64(uid), nil
 	}
 	return 0, nil
 }
 
-func GetUserFromToken(tokenString string) (uint, error) {
+func GetUserFromToken(tokenString string) (int64, error) {
 	token, err := j.Parse(tokenString, func(token *j.Token) (interface{}, error) {
 		if _, ok := token.Method.(*j.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
@@ -107,7 +107,7 @@ func GetUserFromToken(tokenString string) (uint, error) {
 		if err != nil {
 			return 0, err
 		}
-		return uint(uid), nil
+		return int64(uid), nil
 	}
 	return 0, nil
 }

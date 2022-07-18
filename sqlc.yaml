@@ -1,0 +1,16 @@
+version: "2"
+sql:
+  - schema: "schemas/users/schema.sql"
+    queries: "schemas/users/queries.sql"
+    engine: "postgresql"
+    gen:
+      go:
+        package: "models"
+        out: "models/users"
+  - schema: "schemas/trivia/schema.sql"
+    queries: "schemas/trivia/queries.sql"
+    engine: "postgresql"
+    gen:
+      go:
+        package: "models"
+        out: "models/trivia"
