@@ -1,17 +1,17 @@
 -- name: GetUser :one
-SELECT * FROM users
+SELECT * FROM "user"
 WHERE id = $1 LIMIT 1;
 
 -- name: GetUserByUsername :one
-SELECT * FROM users
+SELECT * FROM "user"
 WHERE username = $1 LIMIT 1;
 
 -- name: ListUsers :many
-SELECT * FROM users
+SELECT * FROM "user"
 ORDER BY username;
 
 -- name: CreateUser :one
-INSERT INTO users (
+INSERT INTO "user" (
     username, password
 ) VALUES (
              $1, $2
@@ -19,5 +19,5 @@ INSERT INTO users (
 RETURNING *;
 
 -- name: DeleteUser :exec
-DELETE FROM users
+DELETE FROM "user"
 WHERE id = $1;

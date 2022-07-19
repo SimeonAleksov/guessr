@@ -58,6 +58,7 @@ import Waves from '../../components/Waves.vue'
 import Vinyl from '../../components/Vinyl.vue'
 export default {
   name: 'trivia',
+  middleware: 'auth',
   components: {
       Button,
       TriviaButton,

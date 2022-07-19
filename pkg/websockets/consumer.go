@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func Consume(ctx context.Context, userId uint, client *Client) {
+func Consume(ctx context.Context, userId uint, client *Client, topic string) {
 	l := log.New(os.Stdout, "kafka reader: ", 0)
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:     []string{brokerAddress},

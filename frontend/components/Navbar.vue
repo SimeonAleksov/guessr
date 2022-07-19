@@ -8,10 +8,18 @@
         </NuxtLink>
       </div>
       <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-        <div class="ml-3 relative">
+        <div class="ml-3 relative" v-if="!$auth.loggedIn">
+          <ButtonLink to="/login" class="mr-4">
+            Login
+          </ButtonLink>
         <ButtonLink to="/register">
           Register
         </ButtonLink>
+        </div>
+        <div v-else>
+          <ButtonLink to="/trivia">
+            Start a game
+          </ButtonLink>
         </div>
       </div>
     </div>

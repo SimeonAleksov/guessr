@@ -2,7 +2,6 @@
   <button
     v-on="$listeners"
     type="submit"
-    class="button-85"
     role="button"
   >
     <slot />
@@ -14,7 +13,7 @@ export default {
 }
 </script>
 <style>
-.button-85 {
+button {
   padding: 0.6em 2em;
   border: none;
   outline: none;
@@ -30,7 +29,7 @@ export default {
 
 }
 
-.button-85:before {
+button:before {
   content: "";
   background: linear-gradient(
     45deg,
@@ -53,12 +52,12 @@ export default {
   -webkit-filter: blur(5px);
   width: calc(100% + 4px);
   height: calc(100% + 4px);
-  animation: glowing-button-85 20s linear infinite;
+  animation: glowing-button 20s linear infinite;
   transition: opacity 0.3s ease-in-out;
   border-radius: 10px;
 }
 
-@keyframes glowing-button-85 {
+@keyframes glowing-button {
   0% {
     background-position: 0 0;
   }
@@ -70,7 +69,7 @@ export default {
   }
 }
 
-.button-85:after {
+button:after {
   z-index: -1;
   content: "";
   position: absolute;

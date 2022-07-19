@@ -1,52 +1,51 @@
-CREATE TABLE questions
-(
-    "id"       BIGSERIAL NOT NULL,
-    question   text NOT NULL,
-    is_active  boolean NOT NULL default true,
-    created_at  date NOT NULL default now(),
-    updated_at date NOT NULL,
-    CONSTRAINT PK_9 PRIMARY KEY ( "id" )
+CREATE TABLE "question" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "song" varchar(100) NOT NULL,
+    "is_active" bool NOT NULL,
+    "created_at" date NOT NULL default now(),
+    "updated_at" date NULL
 );
 
-CREATE TABLE choices
-(
-    "id"        BIGSERIAL NOT NULL,
-    question_id BIGSERIAL NOT NULL,
-    is_correct  boolean NOT NULL,
-    choice      text NOT NULL,
-    created_at  date NOT NULL default now(),
-    updated_at  date NOT NULL,
-    CONSTRAINT PK_15 PRIMARY KEY ( "id" ),
-    CONSTRAINT FK_16 FOREIGN KEY ( question_id ) REFERENCES questions ( "id" )
+CREATE TABLE "choice" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "is_correct" bool NOT NULL,
+    "choice" varchar(256) NOT NULL,
+    "question_id" bigint NOT NULL REFERENCES "question" ("id") DEFERRABLE INITIALLY DEFERRED
 );
 
-CREATE INDEX FK_18 ON choices(
-                              question_id
-    );
-
-
-CREATE TABLE user_question_choice
-(
-    "id"        bigint NOT NULL,
-    user_id     bigint NOT NULL,
-    choice_id   bigint NOT NULL,
-    question_id bigint NOT NULL,
-    is_correct  boolean NOT NULL,
-    answer_time date NOT NULL default now(),
-    CONSTRAINT PK_23 PRIMARY KEY ( "id" ),
-    CONSTRAINT FK_24 FOREIGN KEY ( user_id ) REFERENCES users ( "id" ),
-    CONSTRAINT FK_30 FOREIGN KEY ( question_id ) REFERENCES questions ( "id" ),
-    CONSTRAINT FK_33 FOREIGN KEY ( choice_id ) REFERENCES choices ( "id" )
+CREATE TABLE "trivia" (
+    "id" serial NOT NULL PRIMARY KEY ,
+    "name" varchar(128) NOT NULL,
+    "created_at" date NOT NULL,
+    "updated_at" date NULL
 );
 
-CREATE INDEX FK_26 ON user_question_choice (
-                                            user_id
-    );
+CREATE TABLE "trivia_questions" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "trivia_id" bigint NOT NULL REFERENCES "trivia" ("id") DEFERRABLE INITIALLY DEFERRED,
+    "question_id" bigint NOT NULL REFERENCES "question" ("id") DEFERRABLE INITIALLY DEFERRED
+);
 
-CREATE INDEX FK_32 ON user_question_choice (
-                                            question_id
-    );
+CREATE TABLE "gamesession" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "code" varchar(128) NOT NULL,
+    "trivia_id" bigint NOT NULL REFERENCES "trivia" ("id") DEFERRABLE INITIALLY DEFERRED,
+    "created_at" date NOT NULL DEFAULT now(),
+    "finished_at" date NOT NULL
+);
 
-CREATE INDEX FK_35 ON user_question_choice (
-                                            choice_id
-    );
+CREATE TABLE "questionchoice" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "is_correct" bool NOT NULL,
+    "answer_time" date NOT NULL DEFAULT now(),
+    "choice_id" bigint NOT NULL REFERENCES "choice" ("id") DEFERRABLE INITIALLY DEFERRED,
+    "question_id" bigint NOT NULL REFERENCES "question" ("id") DEFERRABLE INITIALLY DEFERRED,
+    "user_id" integer NOT NULL REFERENCES "user" ("id") DEFERRABLE INITIALLY DEFERRED
+);
+
+CREATE TABLE "gamesessionscoreboard" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "score" integer NOT NULL,
+    "game_session_id" bigint NOT NULL REFERENCES "gamesession" ("id") DEFERRABLE INITIALLY DEFERRED,
+    "user_id" integer NOT NULL REFERENCES "user" ("id") DEFERRABLE INITIALLY DEFERRED
+);

@@ -7,20 +7,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
 func Routes(route *gin.Engine) {
-  userController := new(controllers.UserController)
-  auth := route.Group("/auth")
-  {
-    auth.POST("/users", userController.Register)
-    auth.GET("/users/me", userController.CurrentUser)
-  }
-  auth.Use(middleware.AuthenticationMiddleware())
+	userController := new(controllers.UserController)
+	auth := route.Group("/auth")
+	{
+		auth.POST("/users/", userController.Register)
+		auth.GET("/users/me/", userController.CurrentUser)
+	}
+	auth.Use(middleware.AuthenticationMiddleware())
 
-  tokens := route.Group("/auth")
-  {
-    tokens.POST("/token/create/", userController.Login)
-  }
+	tokens := route.Group("/auth")
+	{
+		tokens.POST("/token/", userController.Login)
+	}
 }
-
-

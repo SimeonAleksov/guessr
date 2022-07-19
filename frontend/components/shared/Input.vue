@@ -1,5 +1,11 @@
 <template>
-  <input :placeholder="placeholder" :type="type"/>
+  <input
+    :placeholder="placeholder"
+    :type="type"
+    :model="model"
+    @input="onInput"
+    @change="onChange"
+  />
 </template>
 <script>
 export default {
@@ -12,11 +18,26 @@ export default {
     placeholder: {
       type: String,
       required: true,
+    },
+    model: {
+      required: true,
     }
+  },
+  methods: {
+    onInput(e) {
+      this.$emit("input", e.target.value);
+    },
+    onChange(e) {
+      this.$emit("change", e.target.value);
+    },
   }
 }
 </script>
 <style lang="scss">
+label {
+  color: #d3d0cb;
+  margin-top: 1rem;
+}
 input {
   width: 200px;
   display: block;

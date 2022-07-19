@@ -15,6 +15,7 @@ const (
 	PUBLISH     = "publish"
 	SUBSCRIBE   = "subscribe"
 	UNSUBSCRIBE = "unsubscribe"
+	START       = "start"
 )
 
 type Hub struct {
@@ -100,7 +101,7 @@ func (h *Hub) Subscribe(client *Client, topic string, token string) *Hub {
 		log.Fatalln("User needs to be signed in.")
 	}
 
-	Consume(context.Background(), uint(u), client)
+	Consume(context.Background(), uint(u), client, topic)
 	log.Printf("User with ID %d subscribed to topic %s.\n", u, topic)
 	if len(clientSubs) > 0 {
 		return h
@@ -111,6 +112,12 @@ func (h *Hub) Subscribe(client *Client, topic string, token string) *Hub {
 		UserId: uint(u),
 	}
 	h.Subscriptions = append(h.Subscriptions, newSubscription)
+	return h
+}
+
+func (h *Hub) CreateGame(client *Client, topic string, token string) *Hub {
+	go Produce(context.Background(), topic)
+	h.Subscribe(client, topic, token)
 	return h
 }
 
@@ -148,6 +155,9 @@ func (h *Hub) HandleReceiveMessage(client Client, payload []byte) *Hub {
 	case UNSUBSCRIBE:
 		h.RemoveClient(client)
 		fmt.Println("Client want to unsubscribe the topic", m.Topic, client.Id)
+	case START:
+		h.CreateGame(&client, m.Topic, m.Token)
+		fmt.Printf("Starting a new game with code: %s", m.Topic)
 	default:
 		break
 	}

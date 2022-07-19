@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"github.com/segmentio/kafka-go"
-	kfk "guessr.net/pkg/websockets"
 	"time"
 
 	"github.com/spf13/viper"
@@ -29,7 +28,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	go kfk.Produce(context.Background())
 	router := routers.SetupRoute()
 	logger.Fatalf("%v", router.Run(config.ServerConfig()))
 	err = conn.Close()

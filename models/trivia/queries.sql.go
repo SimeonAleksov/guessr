@@ -10,12 +10,12 @@ import (
 )
 
 const createChoice = `-- name: CreateChoice :one
-INSERT INTO choices (
+INSERT INTO choice (
     question_id, choice, is_correct
 ) VALUES (
-             $1, $2, $3
-         )
-RETURNING id, question_id, is_correct, choice, created_at, updated_at
+    $1, $2, $3
+)
+RETURNING id, is_correct, choice, question_id
 `
 
 type CreateChoiceParams struct {
@@ -29,30 +29,28 @@ func (q *Queries) CreateChoice(ctx context.Context, arg CreateChoiceParams) (Cho
 	var i Choice
 	err := row.Scan(
 		&i.ID,
-		&i.QuestionID,
 		&i.IsCorrect,
 		&i.Choice,
-		&i.CreatedAt,
-		&i.UpdatedAt,
+		&i.QuestionID,
 	)
 	return i, err
 }
 
 const createQuestion = `-- name: CreateQuestion :one
-INSERT INTO questions (
-    question
+INSERT INTO question (
+    song
 ) VALUES (
-             $1
-         )
-RETURNING id, question, is_active, created_at, updated_at
+    $1
+)
+RETURNING id, song, is_active, created_at, updated_at
 `
 
-func (q *Queries) CreateQuestion(ctx context.Context, question string) (Question, error) {
-	row := q.db.QueryRowContext(ctx, createQuestion, question)
+func (q *Queries) CreateQuestion(ctx context.Context, song string) (Question, error) {
+	row := q.db.QueryRowContext(ctx, createQuestion, song)
 	var i Question
 	err := row.Scan(
 		&i.ID,
-		&i.Question,
+		&i.Song,
 		&i.IsActive,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -61,42 +59,42 @@ func (q *Queries) CreateQuestion(ctx context.Context, question string) (Question
 }
 
 const createUserQuestionChoice = `-- name: CreateUserQuestionChoice :one
-INSERT INTO user_question_choice (
+INSERT INTO questionchoice (
     user_id, choice_id, question_id, is_correct
 ) VALUES (
-             $1, $2, $3, $4
-         )
-RETURNING id, user_id, choice_id, question_id, is_correct, answer_time
+    $1, $2, $3, $4
+)
+RETURNING id, is_correct, answer_time, choice_id, question_id, user_id
 `
 
 type CreateUserQuestionChoiceParams struct {
-	UserID     int64
+	UserID     int32
 	ChoiceID   int64
 	QuestionID int64
 	IsCorrect  bool
 }
 
-func (q *Queries) CreateUserQuestionChoice(ctx context.Context, arg CreateUserQuestionChoiceParams) (UserQuestionChoice, error) {
+func (q *Queries) CreateUserQuestionChoice(ctx context.Context, arg CreateUserQuestionChoiceParams) (Questionchoice, error) {
 	row := q.db.QueryRowContext(ctx, createUserQuestionChoice,
 		arg.UserID,
 		arg.ChoiceID,
 		arg.QuestionID,
 		arg.IsCorrect,
 	)
-	var i UserQuestionChoice
+	var i Questionchoice
 	err := row.Scan(
 		&i.ID,
-		&i.UserID,
-		&i.ChoiceID,
-		&i.QuestionID,
 		&i.IsCorrect,
 		&i.AnswerTime,
+		&i.ChoiceID,
+		&i.QuestionID,
+		&i.UserID,
 	)
 	return i, err
 }
 
 const getChoice = `-- name: GetChoice :one
-SELECT id, question_id, is_correct, choice, created_at, updated_at FROM choices
+SELECT id, is_correct, choice, question_id FROM choice
 WHERE question_id = $1 LIMIT 4
 `
 
@@ -105,26 +103,24 @@ func (q *Queries) GetChoice(ctx context.Context, questionID int64) (Choice, erro
 	var i Choice
 	err := row.Scan(
 		&i.ID,
-		&i.QuestionID,
 		&i.IsCorrect,
 		&i.Choice,
-		&i.CreatedAt,
-		&i.UpdatedAt,
+		&i.QuestionID,
 	)
 	return i, err
 }
 
 const getQuestion = `-- name: GetQuestion :one
-SELECT id, question, is_active, created_at, updated_at FROM questions
+SELECT id, song, is_active, created_at, updated_at FROM question
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetQuestion(ctx context.Context, id int64) (Question, error) {
+func (q *Queries) GetQuestion(ctx context.Context, id int32) (Question, error) {
 	row := q.db.QueryRowContext(ctx, getQuestion, id)
 	var i Question
 	err := row.Scan(
 		&i.ID,
-		&i.Question,
+		&i.Song,
 		&i.IsActive,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -133,26 +129,26 @@ func (q *Queries) GetQuestion(ctx context.Context, id int64) (Question, error) {
 }
 
 const getUserQuestionChoice = `-- name: GetUserQuestionChoice :one
-SELECT id, user_id, choice_id, question_id, is_correct, answer_time FROM user_question_choice
+SELECT id, is_correct, answer_time, choice_id, question_id, user_id FROM questionchoice
 WHERE question_id = $1 LIMIT 1
 `
 
-func (q *Queries) GetUserQuestionChoice(ctx context.Context, questionID int64) (UserQuestionChoice, error) {
+func (q *Queries) GetUserQuestionChoice(ctx context.Context, questionID int64) (Questionchoice, error) {
 	row := q.db.QueryRowContext(ctx, getUserQuestionChoice, questionID)
-	var i UserQuestionChoice
+	var i Questionchoice
 	err := row.Scan(
 		&i.ID,
-		&i.UserID,
-		&i.ChoiceID,
-		&i.QuestionID,
 		&i.IsCorrect,
 		&i.AnswerTime,
+		&i.ChoiceID,
+		&i.QuestionID,
+		&i.UserID,
 	)
 	return i, err
 }
 
 const listChoices = `-- name: ListChoices :many
-SELECT id, question_id, is_correct, choice, created_at, updated_at FROM choices
+SELECT id, is_correct, choice, question_id FROM choice
 ORDER BY id
 `
 
@@ -167,11 +163,9 @@ func (q *Queries) ListChoices(ctx context.Context) ([]Choice, error) {
 		var i Choice
 		if err := rows.Scan(
 			&i.ID,
-			&i.QuestionID,
 			&i.IsCorrect,
 			&i.Choice,
-			&i.CreatedAt,
-			&i.UpdatedAt,
+			&i.QuestionID,
 		); err != nil {
 			return nil, err
 		}
@@ -187,7 +181,7 @@ func (q *Queries) ListChoices(ctx context.Context) ([]Choice, error) {
 }
 
 const listQuestions = `-- name: ListQuestions :many
-SELECT id, question, is_active, created_at, updated_at FROM questions
+SELECT id, song, is_active, created_at, updated_at FROM question
 ORDER BY id
 `
 
@@ -202,7 +196,7 @@ func (q *Queries) ListQuestions(ctx context.Context) ([]Question, error) {
 		var i Question
 		if err := rows.Scan(
 			&i.ID,
-			&i.Question,
+			&i.Song,
 			&i.IsActive,
 			&i.CreatedAt,
 			&i.UpdatedAt,

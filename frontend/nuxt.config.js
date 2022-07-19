@@ -38,13 +38,45 @@ export default {
     // https://go.nuxtjs.dev/tailwindcss
     "@nuxtjs/color-mode",
     '@nuxtjs/tailwindcss',
+    '@braid/vue-formulate/nuxt'
   ],
 
-  // Modules: https://go.nuxtjs.dev/config-modules
+  // Modules: https://o.nuxtjs.dev/config-modules
   modules: [
-    '@nuxtjs/color-mode'
+    '@nuxtjs/color-mode',
+    '@nuxtjs/axios',
+    '@nuxtjs/auth-next'
   ],
-
+  axios: {
+    baseURL: 'http://localhost:8000'
+  },
+  auth: {
+    strategies: {
+      local: {
+        token: {
+          property: "access_token",
+          global: true,
+          required: true,
+          type: "Bearer"
+        },
+        user: {
+          property: false,
+          autoFetch: true
+        },
+        endpoints: {
+          login: { url: "/auth/token/", method: "post" },
+          user: { url: "/auth/users/me/", method: "get" },
+          logout: false
+        }
+      }
+    },
+    redirect: {
+      login: "/login",
+      callback: '/',
+      home: '/',
+      logout: "/"
+    }
+  },
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
   }

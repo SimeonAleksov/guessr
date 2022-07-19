@@ -10,7 +10,7 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (
+INSERT INTO "user" (
     username, password
 ) VALUES (
              $1, $2
@@ -36,7 +36,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 }
 
 const deleteUser = `-- name: DeleteUser :exec
-DELETE FROM users
+DELETE FROM "user"
 WHERE id = $1
 `
 
@@ -46,7 +46,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, username, password, created_at FROM users
+SELECT id, username, password, created_at FROM "user"
 WHERE id = $1 LIMIT 1
 `
 
@@ -63,7 +63,7 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 }
 
 const getUserByUsername = `-- name: GetUserByUsername :one
-SELECT id, username, password, created_at FROM users
+SELECT id, username, password, created_at FROM "user"
 WHERE username = $1 LIMIT 1
 `
 
@@ -80,7 +80,7 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, username, password, created_at FROM users
+SELECT id, username, password, created_at FROM "user"
 ORDER BY username
 `
 

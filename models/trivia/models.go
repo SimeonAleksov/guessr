@@ -5,31 +5,58 @@
 package models
 
 import (
+	"database/sql"
 	"time"
 )
 
 type Choice struct {
-	ID         int64
-	QuestionID int64
+	ID         int32
 	IsCorrect  bool
 	Choice     string
+	QuestionID int64
+}
+
+type Gamesession struct {
+	ID         int32
+	Code       string
+	TriviaID   int64
 	CreatedAt  time.Time
-	UpdatedAt  time.Time
+	FinishedAt time.Time
+}
+
+type Gamesessionscoreboard struct {
+	ID            int32
+	Score         int32
+	GameSessionID int64
+	UserID        int32
 }
 
 type Question struct {
-	ID        int64
-	Question  string
+	ID        int32
+	Song      string
 	IsActive  bool
 	CreatedAt time.Time
-	UpdatedAt time.Time
+	UpdatedAt sql.NullTime
 }
 
-type UserQuestionChoice struct {
-	ID         int64
-	UserID     int64
-	ChoiceID   int64
-	QuestionID int64
+type Questionchoice struct {
+	ID         int32
 	IsCorrect  bool
 	AnswerTime time.Time
+	ChoiceID   int64
+	QuestionID int64
+	UserID     int32
+}
+
+type TriviaQuestion struct {
+	ID         int32
+	TriviaID   int64
+	QuestionID int64
+}
+
+type Trivium struct {
+	ID        int32
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt sql.NullTime
 }

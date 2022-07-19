@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-col justify-center items-center" v-if="!$auth.loggedIn">
-  <h1 class="font-mono text-4xl dark:text-secondary mb-4">
-    Create an account
-  </h1>
+    <h1 class="font-mono text-4xl dark:text-secondary mb-4">
+      Log in
+    </h1>
     <FormulateForm
       class="flex flex-col"
       v-model="values"
@@ -16,7 +16,7 @@
 import Button from '../../components/shared/Button.vue';
 
 export default {
-  name: 'register',
+  name: 'login',
   components: {
     Button,
   },
@@ -46,7 +46,6 @@ export default {
   methods: {
     async login() {
       try {
-        await this.$axios.post('auth/users/', this.values)
         await this.$auth.loginWith('local', {data: this.values})
         await this.$router.push('/trivia');
       } catch (err) {
