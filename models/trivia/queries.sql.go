@@ -7,6 +7,7 @@ package models
 
 import (
 	"context"
+	"database/sql"
 )
 
 const createChoice = `-- name: CreateChoice :one
@@ -32,6 +33,31 @@ func (q *Queries) CreateChoice(ctx context.Context, arg CreateChoiceParams) (Cho
 		&i.IsCorrect,
 		&i.Choice,
 		&i.QuestionID,
+	)
+	return i, err
+}
+
+const createGameSession = `-- name: CreateGameSession :one
+insert into gamesession (code, trivia_id, finished_at)
+values ($1, $2, $3)
+RETURNING id, code, trivia_id, created_at, finished_at
+`
+
+type CreateGameSessionParams struct {
+	Code       string
+	TriviaID   int64
+	FinishedAt sql.NullTime
+}
+
+func (q *Queries) CreateGameSession(ctx context.Context, arg CreateGameSessionParams) (Gamesession, error) {
+	row := q.db.QueryRowContext(ctx, createGameSession, arg.Code, arg.TriviaID, arg.FinishedAt)
+	var i Gamesession
+	err := row.Scan(
+		&i.ID,
+		&i.Code,
+		&i.TriviaID,
+		&i.CreatedAt,
+		&i.FinishedAt,
 	)
 	return i, err
 }
@@ -93,6 +119,39 @@ func (q *Queries) CreateUserQuestionChoice(ctx context.Context, arg CreateUserQu
 	return i, err
 }
 
+const getAllTrivia = `-- name: GetAllTrivia :many
+select id, name, image_path from trivia
+`
+
+type GetAllTriviaRow struct {
+	ID        int32
+	Name      string
+	ImagePath sql.NullString
+}
+
+func (q *Queries) GetAllTrivia(ctx context.Context) ([]GetAllTriviaRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllTrivia)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllTriviaRow
+	for rows.Next() {
+		var i GetAllTriviaRow
+		if err := rows.Scan(&i.ID, &i.Name, &i.ImagePath); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getChoice = `-- name: GetChoice :one
 SELECT id, is_correct, choice, question_id FROM choice
 WHERE question_id = $1 LIMIT 4
@@ -106,6 +165,24 @@ func (q *Queries) GetChoice(ctx context.Context, questionID int64) (Choice, erro
 		&i.IsCorrect,
 		&i.Choice,
 		&i.QuestionID,
+	)
+	return i, err
+}
+
+const getGameSession = `-- name: GetGameSession :one
+select id, code, trivia_id, created_at, finished_at from gamesession
+where code = $1
+`
+
+func (q *Queries) GetGameSession(ctx context.Context, code string) (Gamesession, error) {
+	row := q.db.QueryRowContext(ctx, getGameSession, code)
+	var i Gamesession
+	err := row.Scan(
+		&i.ID,
+		&i.Code,
+		&i.TriviaID,
+		&i.CreatedAt,
+		&i.FinishedAt,
 	)
 	return i, err
 }
@@ -125,6 +202,23 @@ func (q *Queries) GetQuestion(ctx context.Context, id int32) (Question, error) {
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
+	return i, err
+}
+
+const getTrivia = `-- name: GetTrivia :one
+select id, name from trivia
+where name = $1
+`
+
+type GetTriviaRow struct {
+	ID   int32
+	Name string
+}
+
+func (q *Queries) GetTrivia(ctx context.Context, name string) (GetTriviaRow, error) {
+	row := q.db.QueryRowContext(ctx, getTrivia, name)
+	var i GetTriviaRow
+	err := row.Scan(&i.ID, &i.Name)
 	return i, err
 }
 

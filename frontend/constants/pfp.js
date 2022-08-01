@@ -1,0 +1,7 @@
+export const images = [
+  'https://avataaars.io/?avatarStyle=Transparent&topType=ShortHairShortFlat&accessoriesType=Blank&hairColor=Blue&facialHairType=BeardMedium&facialHairColor=Blonde&clotheType=Hoodie&clotheColor=Blue03&eyeType=Dizzy&eyebrowType=UpDown&mouthType=Disbelief&skinColor=Pale',
+  'https://avataaars.io/?avatarStyle=Transparent&topType=ShortHairDreads02&accessoriesType=Prescription02&hatColor=Gray01&hairColor=BrownDark&facialHairType=BeardMedium&facialHairColor=BrownDark&clotheType=CollarSweater&clotheColor=PastelOrange&eyeType=WinkWacky&eyebrowType=UnibrowNatural&mouthType=Disbelief&skinColor=DarkBrown',
+  'https://avataaars.io/?avatarStyle=Transparent&topType=LongHairStraight2&accessoriesType=Sunglasses&hairColor=Red&facialHairType=BeardMedium&facialHairColor=BlondeGolden&clotheType=GraphicShirt&clotheColor=Blue02&graphicType=Selena&eyeType=Surprised&eyebrowType=SadConcernedNatural&mouthType=Vomit&skinColor=Light',
+  'https://avataaars.io/?avatarStyle=Transparent&topType=NoHair&accessoriesType=Sunglasses&facialHairType=Blank&clotheType=GraphicShirt&clotheColor=Heather&graphicType=Skull&eyeType=Default&eyebrowType=RaisedExcited&mouthType=ScreamOpen&skinColor=Black',
+  'https://avataaars.io/?avatarStyle=Transparent&topType=LongHairBigHair&accessoriesType=Kurt&hairColor=Black&facialHairType=Blank&clotheType=ShirtCrewNeck&clotheColor=Red&eyeType=Surprised&eyebrowType=SadConcernedNatural&mouthType=ScreamOpen&skinColor=Pale',
+]

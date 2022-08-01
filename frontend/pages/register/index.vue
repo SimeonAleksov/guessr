@@ -46,7 +46,11 @@ export default {
   methods: {
     async login() {
       try {
-        await this.$axios.post('auth/users/', this.values)
+        await this.$axios.post('auth/users/', this.values, {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        })
         await this.$auth.loginWith('local', {data: this.values})
         await this.$router.push('/trivia');
       } catch (err) {

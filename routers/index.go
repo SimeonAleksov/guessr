@@ -14,6 +14,9 @@ func RegisterRoutes(route *gin.Engine) {
 	})
 	InternalRoutes(route)
 	Routes(route)
+	TriviaRoutes(route)
+
+	// route.StaticFS("/songs/", http.Dir("songs"))
 
 	route.GET(
 		"/ws/", func(ctx *gin.Context) {

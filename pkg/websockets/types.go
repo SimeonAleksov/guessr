@@ -4,18 +4,21 @@ import (
 	"context"
 	"fmt"
 	"github.com/goccy/go-json"
+	"github.com/gorilla/websocket"
+	"github.com/segmentio/kafka-go"
+	models "guessr.net/models/trivia"
+	userServices "guessr.net/models/users"
 	"guessr.net/pkg/jwt"
 	"log"
 	"sync"
-
-	"github.com/gorilla/websocket"
 )
 
 const (
-	PUBLISH     = "publish"
-	SUBSCRIBE   = "subscribe"
-	UNSUBSCRIBE = "unsubscribe"
-	START       = "start"
+	PUBLISH        = "publish"
+	SUBSCRIBE      = "subscribe"
+	UNSUBSCRIBE    = "unsubscribe"
+	CREATE_OR_JOIN = "create_or_join"
+	START          = "start"
 )
 
 type Hub struct {
@@ -33,8 +36,8 @@ type EndMessage struct {
 }
 
 type Subscription struct {
-	Topic  string
-	Client *Client
+	Topic  string  `json:"-"`
+	Client *Client `json:"-"`
 	UserId uint
 	*sync.Mutex
 }
@@ -46,6 +49,11 @@ type Message struct {
 	Data   json.RawMessage `json:"data"`
 }
 
+type CreateGameMessage struct {
+	TriviaID int64  `json:"triviaID"`
+	Code     string `json:"code"`
+}
+
 type ErrorLine struct {
 	Error       string      `json:"error"`
 	ErrorDetail ErrorDetail `json:"errorDetail"`
@@ -53,6 +61,10 @@ type ErrorLine struct {
 
 type ErrorDetail struct {
 	Message string `json:"message"`
+}
+
+type KafkaController struct {
+	conn *kafka.Conn
 }
 
 func (h *Hub) AddClient(client Client) *Hub {
@@ -101,8 +113,6 @@ func (h *Hub) Subscribe(client *Client, topic string, token string) *Hub {
 		log.Fatalln("User needs to be signed in.")
 	}
 
-	Consume(context.Background(), uint(u), client, topic)
-	log.Printf("User with ID %d subscribed to topic %s.\n", u, topic)
 	if len(clientSubs) > 0 {
 		return h
 	}
@@ -112,13 +122,40 @@ func (h *Hub) Subscribe(client *Client, topic string, token string) *Hub {
 		UserId: uint(u),
 	}
 	h.Subscriptions = append(h.Subscriptions, newSubscription)
+	h.CurrentUsers(topic)
+	go Consume(context.Background(), uint(u), client, topic)
+	return h
+}
+func (h *Hub) CreateGame(client *Client, topic string, token string, gameMessage *CreateGameMessage) *Hub {
+	var tr models.TriviaService
+	tr = models.S(gameMessage.Code)
+	gameSession, created := tr.GetOrCreateGameSession(gameMessage.Code, gameMessage.TriviaID)
+	var msg GameMessage
+	msg.Type = JOINED
+	if created {
+		CreateTopic(1, topic, 1)
+		msg.Type = CREATED
+	}
+	m, err := json.Marshal(msg)
+	if err != nil {
+		log.Println(err)
+	}
+	err = client.Send(m)
+	if err != nil {
+		return nil
+	}
+	h.Subscribe(client, gameSession.Code, token)
 	return h
 }
 
-func (h *Hub) CreateGame(client *Client, topic string, token string) *Hub {
-	go Produce(context.Background(), topic)
-	h.Subscribe(client, topic, token)
+func (h *Hub) StartGame(client *Client, topic string, token string) *Hub {
+	Countdown(5, topic)
+	StartGameSession()
 	return h
+}
+
+func (h *Hub) StartgameSession() {
+
 }
 
 func (h *Hub) Publish(topic string, message []byte) {
@@ -129,6 +166,25 @@ func (h *Hub) Publish(topic string, message []byte) {
 			log.Panic(err)
 		}
 	}
+}
+
+func (h *Hub) CurrentUsers(topic string) {
+	subscriptions := h.GetSubscriptions(topic, nil)
+	var currentUsers []User
+	for _, sub := range subscriptions {
+		user, err := userServices.GetUserByID(int64(sub.UserId))
+		if err != nil {
+			log.Println(err)
+		}
+		u := User{Username: user.Username}
+		currentUsers = append(currentUsers, u)
+	}
+	msg := CurrentUsersMessage{Users: currentUsers, Type: CURRENT_USERS}
+	b, err := json.Marshal(msg)
+	if err != nil {
+		log.Println(err)
+	}
+	h.Publish(topic, b)
 }
 
 func (h *Hub) Unsubscribe(client *Client, topic string) *Hub {
@@ -155,9 +211,17 @@ func (h *Hub) HandleReceiveMessage(client Client, payload []byte) *Hub {
 	case UNSUBSCRIBE:
 		h.RemoveClient(client)
 		fmt.Println("Client want to unsubscribe the topic", m.Topic, client.Id)
-	case START:
-		h.CreateGame(&client, m.Topic, m.Token)
+	case CREATE_OR_JOIN:
+		cr := CreateGameMessage{}
+		err := json.Unmarshal(m.Data, &cr)
+		if err != nil {
+			log.Println("Missing trivia ID.")
+		}
+		h.CreateGame(&client, m.Topic, m.Token, &cr)
 		fmt.Printf("Starting a new game with code: %s", m.Topic)
+	case START:
+		fmt.Printf("Starting a created game with code: %s", m.Topic)
+		h.StartGame(&client, m.Topic, m.Token)
 	default:
 		break
 	}

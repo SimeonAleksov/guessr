@@ -17,7 +17,7 @@
         </ButtonLink>
         </div>
         <div v-else>
-          <ButtonLink to="/trivia">
+          <ButtonLink to="/trivia/start">
             Start a game
           </ButtonLink>
         </div>

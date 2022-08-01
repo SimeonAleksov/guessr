@@ -21,7 +21,7 @@ type Gamesession struct {
 	Code       string
 	TriviaID   int64
 	CreatedAt  time.Time
-	FinishedAt time.Time
+	FinishedAt sql.NullTime
 }
 
 type Gamesessionscoreboard struct {
@@ -57,6 +57,7 @@ type TriviaQuestion struct {
 type Trivium struct {
 	ID        int32
 	Name      string
+	ImagePath sql.NullString
 	CreatedAt time.Time
 	UpdatedAt sql.NullTime
 }

@@ -43,3 +43,42 @@ INSERT INTO questionchoice (
     $1, $2, $3, $4
 )
 RETURNING *;
+
+-- name: CreateGameSession :one
+insert into gamesession (code, trivia_id, finished_at)
+values ($1, $2, $3)
+RETURNING *;
+
+-- name: GetGameSession :one
+select * from gamesession
+where code = $1;
+
+-- name: GetTrivia :one
+select id, name from trivia
+where name = $1;
+
+-- name: GetAllTrivia :many
+select id, name, image_path from trivia;
+
+-- name: FetchTriviaByGameSession :many
+SELECT
+    "question"."song",
+    "choice"."is_correct",
+    "choice"."choice",
+    "choice"."id"
+FROM
+    "trivia"
+        INNER JOIN "gamesession" ON (
+            "trivia"."id" = "gamesession"."trivia_id"
+        )
+        LEFT OUTER JOIN "trivia_questions" ON (
+            "trivia"."id" = "trivia_questions"."trivia_id"
+        )
+        LEFT OUTER JOIN "question" ON (
+            "trivia_questions"."question_id" = "question"."id"
+        )
+        LEFT OUTER JOIN "choice" ON (
+            "question"."id" = "choice"."question_id"
+        )
+WHERE
+        "gamesession"."id" = $1;

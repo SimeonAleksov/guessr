@@ -3,6 +3,7 @@ package websockets
 import (
 	"github.com/gorilla/websocket"
 	"github.com/satori/go.uuid"
+	"github.com/segmentio/kafka-go"
 	"log"
 	"net/http"
 )
@@ -13,6 +14,7 @@ var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 }
+var ControllerConn *kafka.Conn
 
 func ServeWs(w http.ResponseWriter, r *http.Request) {
 	upgrader.CheckOrigin = func(r *http.Request) bool {

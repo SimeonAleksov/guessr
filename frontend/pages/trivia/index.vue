@@ -71,7 +71,7 @@ export default {
     hls.attachMedia(video);
     hls.on(Hls.Events.MEDIA_ATTACHED, function () {
       console.log('video and hls.js are now bound together !');
-      hls.loadSource('http://localhost:4000/songs/brkovi/outputlist.m3u8');
+      hls.loadSource('http://localhost:8000/songs/soad/lost-in-hollywood/outputlist.m3u8');
       hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
         console.log(
           'manifest loaded, found ' + data.levels.length + ' quality level'

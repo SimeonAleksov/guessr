@@ -13,14 +13,15 @@ import (
 func Consume(ctx context.Context, userId uint, client *Client, topic string) {
 	l := log.New(os.Stdout, "kafka reader: ", 0)
 	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:     []string{brokerAddress},
-		Topic:       topic,
-		GroupID:     strconv.Itoa(int(userId)),
-		Logger:      l,
-		MinBytes:    10e3, // 10KB
-		MaxBytes:    10e6, // 10MB
-		MaxWait:     3 * time.Second,
-		StartOffset: kafka.FirstOffset,
+		Brokers:         []string{brokerAddress},
+		Topic:           topic,
+		GroupID:         strconv.Itoa(int(userId)),
+		Logger:          l,
+		MinBytes:        1,
+		MaxBytes:        10e6,
+		MaxWait:         3 * time.Second,
+		StartOffset:     kafka.FirstOffset,
+		ReadLagInterval: -1,
 	})
 	defer func(r *kafka.Reader) {
 		err := r.Close()
